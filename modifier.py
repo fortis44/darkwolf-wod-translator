@@ -22,7 +22,7 @@ def modify_wod(wod_data: dict) -> dict:
 
     Returns dict with keys: tbi, tbi_rc (each containing the structured modification).
     """
-    client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
+    client = anthropic.AnthropicBedrock(aws_region=config.AWS_REGION)
 
     raw_text = wod_data["raw_text"]
     is_rest_day = wod_data.get("is_rest_day", False)
@@ -61,7 +61,7 @@ def _build_user_message(raw_text: str, is_rest_day: bool) -> str:
     )
 
 
-def _call_claude(client: anthropic.Anthropic, system_prompt: str, user_message: str) -> dict:
+def _call_claude(client: anthropic.AnthropicBedrock, system_prompt: str, user_message: str) -> dict:
     """Make a single Claude API call and parse the JSON response."""
     response = client.messages.create(
         model=config.CLAUDE_MODEL,

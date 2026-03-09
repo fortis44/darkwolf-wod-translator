@@ -22,9 +22,9 @@ OUTPUT_DIR.mkdir(exist_ok=True)
 # CrossFit
 CROSSFIT_WOD_URL = "https://www.crossfit.com/wod"
 
-# Claude API
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-CLAUDE_MODEL = "claude-sonnet-4-20250514"
+# Claude API via AWS Bedrock
+AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
+CLAUDE_MODEL = "us.anthropic.claude-sonnet-4-20250514-v1:0"
 
 # FTP / SFTP (Hostinger)
 FTP_HOST = os.getenv("FTP_HOST", "")
