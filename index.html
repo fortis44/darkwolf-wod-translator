@@ -21,15 +21,47 @@
 
 <div class="container">
 
-    <h2 class="date-header">WOD Archive</h2>
-    <p class="wod-title">Daily CrossFit WODs modified for TBI recovery and shoulder safety.</p>
-
-    
+    <!-- About -->
     <div class="card">
+        <div class="card-header" onclick="this.parentElement.classList.toggle('collapsed')">
+            <span class="card-label">What Is This?</span>
+            <span class="card-toggle">[ toggle ]</span>
+        </div>
         <div class="card-body">
-            <p style="color: var(--grey);">No WODs processed yet. Check back tomorrow.</p>
+            <p style="color: var(--white); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1rem;">
+                CrossFit.com publishes a daily WOD designed for the general population. For many in the TBI community, those workouts aren't safe to follow as written &mdash; high impact, max effort, and overhead volume that can trigger symptoms or cause injury.
+            </p>
+            <p style="color: var(--white); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1rem;">
+                This project takes each day's public WOD and generates two modified versions using AI:
+            </p>
+            <p style="color: var(--white); font-size: 0.9rem; line-height: 1.7; margin-bottom: 0.5rem;">
+                <strong style="color: var(--neon);">TBI-Adapted</strong> &mdash; Intensity capped at RPE 7-8, high-impact movements swapped for lower-impact alternatives, intracranial pressure managed, warmup and cooldown included. Built for athletes 1+ years post-concussion who want to train hard but smart.
+            </p>
+            <p style="color: var(--white); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1rem;">
+                <strong style="color: var(--orange);">Shoulder-Safe</strong> &mdash; All kipping, heavy overhead, and snatch movements replaced with shoulder-safe alternatives at full training intensity. This version exists because I have two torn rotator cuffs and needed a way to keep training without making them worse. If that's you too, this is for you.
+            </p>
+            <p style="color: var(--grey); font-size: 0.85rem; line-height: 1.7;">
+                This is an experiment &mdash; exploring whether AI can reliably convert mainstream CrossFit programming into something accessible for communities that are typically left out. New WODs published daily.
+            </p>
         </div>
     </div>
+
+    <h2 class="date-header">WOD Archive</h2>
+
+    
+    <ul class="wod-list">
+        
+        <li>
+            <a href="2026-03-09.html">
+                <div class="wod-date">
+                    Monday, March 09, 2026
+                    
+                </div>
+                <div class="wod-title-text">CrossFit</div>
+            </a>
+        </li>
+        
+    </ul>
     
 
     <div class="disclaimer">
