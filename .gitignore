@@ -3,6 +3,7 @@ venv/
 __pycache__/
 *.pyc
 output/
+gh-pages/
 logs/
 data/
 .claude/

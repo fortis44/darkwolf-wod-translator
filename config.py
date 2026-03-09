@@ -26,15 +26,8 @@ CROSSFIT_WOD_URL = "https://www.crossfit.com/wod"
 AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
 CLAUDE_MODEL = "us.anthropic.claude-sonnet-4-20250514-v1:0"
 
-# FTP / SFTP (Hostinger)
-FTP_HOST = os.getenv("FTP_HOST", "")
-FTP_PORT = int(os.getenv("FTP_PORT", "22"))
-FTP_USERNAME = os.getenv("FTP_USERNAME", "")
-FTP_PASSWORD = os.getenv("FTP_PASSWORD", "")
-FTP_REMOTE_DIR = os.getenv("FTP_REMOTE_DIR", "/public_html/wod/")
-
 # Site
-SITE_BASE_URL = "https://www.darkwolfmissionlog.com/wod"
+SITE_BASE_URL = "https://wod.darkwolfmissionlog.com"
 
 # Retry settings
 MAX_RETRIES = 3

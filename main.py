@@ -5,7 +5,7 @@ Orchestrates the full pipeline:
 2. Scrape crossfit.com
 3. Generate both modifications via Claude API
 4. Build HTML pages
-5. Upload to Hostinger
+5. Publish to GitHub Pages
 6. Log results
 """
 
@@ -21,7 +21,7 @@ import config
 from scraper import fetch_wod
 from modifier import modify_wod
 from generator import generate_wod_page, generate_index_page
-from publisher import upload_files, upload_css
+from publisher import publish
 
 
 def setup_logging():
@@ -100,17 +100,12 @@ def run():
         wod_page_path = generate_wod_page(wod_data, modifications)
         index_page_path = generate_index_page()
 
-        # Step 4: Upload
-        logger.info("Step 4: Uploading to Hostinger...")
-        css_path = str(config.TEMPLATES_DIR / "style.css")
-        files_to_upload = [wod_page_path, index_page_path]
-        if Path(css_path).exists():
-            files_to_upload.append(css_path)
-
-        uploaded = upload_files(files_to_upload)
-        if not uploaded:
-            log_entry["errors"].append("Upload skipped or failed (check FTP config)")
-            logger.warning("Upload skipped or failed — files saved locally")
+        # Step 4: Publish to GitHub Pages
+        logger.info("Step 4: Publishing to GitHub Pages...")
+        published = publish([wod_page_path, index_page_path])
+        if not published:
+            log_entry["errors"].append("Publish to GitHub Pages failed")
+            logger.warning("Publish failed — files saved locally only")
 
         # Success
         log_entry["status"] = "success"

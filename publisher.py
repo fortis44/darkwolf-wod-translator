@@ -1,87 +1,116 @@
-"""Uploads generated files to Hostinger via SFTP."""
+"""Publishes generated WOD pages to GitHub Pages via git push."""
 
 import logging
-import os
+import shutil
+import subprocess
 from pathlib import Path
-
-import paramiko
 
 import config
 
 logger = logging.getLogger(__name__)
 
+PAGES_DIR = config.BASE_DIR / "gh-pages"
 
-def upload_files(file_paths: list[str]) -> bool:
-    """Upload a list of local files to the Hostinger remote directory.
+
+def publish(file_paths: list[str]) -> bool:
+    """Copy generated files into the gh-pages branch and push.
 
     Args:
-        file_paths: List of absolute paths to files to upload.
+        file_paths: List of absolute paths to files to publish.
 
     Returns:
-        True if all files uploaded successfully.
+        True if published successfully.
     """
-    if not config.FTP_HOST:
-        logger.warning("FTP_HOST not configured — skipping upload")
-        return False
-
     try:
-        transport = paramiko.Transport((config.FTP_HOST, config.FTP_PORT))
-        transport.connect(username=config.FTP_USERNAME, password=config.FTP_PASSWORD)
-        sftp = paramiko.SFTPClient.from_transport(transport)
+        _ensure_pages_branch()
 
-        # Ensure remote directory exists
-        _mkdir_p(sftp, config.FTP_REMOTE_DIR)
+        # Copy CSS
+        css_src = config.TEMPLATES_DIR / "style.css"
+        if css_src.exists():
+            shutil.copy2(str(css_src), str(PAGES_DIR / "style.css"))
 
+        # Copy each generated file
         for local_path in file_paths:
             filename = Path(local_path).name
-            remote_path = config.FTP_REMOTE_DIR.rstrip("/") + "/" + filename
-            logger.info("Uploading %s -> %s", filename, remote_path)
-            sftp.put(local_path, remote_path)
+            dest = PAGES_DIR / filename
+            shutil.copy2(local_path, str(dest))
+            logger.info("Copied %s to gh-pages/", filename)
 
-            # Verify upload
-            remote_stat = sftp.stat(remote_path)
-            local_size = os.path.getsize(local_path)
-            if remote_stat.st_size != local_size:
-                logger.error(
-                    "Size mismatch for %s: local=%d remote=%d",
-                    filename, local_size, remote_stat.st_size,
-                )
-                return False
+        # Git add, commit, push
+        _run_git("add", "-A", cwd=PAGES_DIR)
 
-        sftp.close()
-        transport.close()
-        logger.info("All %d files uploaded successfully", len(file_paths))
+        # Check if there's anything to commit
+        result = _run_git("status", "--porcelain", cwd=PAGES_DIR)
+        if not result.strip():
+            logger.info("No changes to publish")
+            return True
+
+        _run_git("commit", "-m", "Update WOD pages", cwd=PAGES_DIR)
+        _run_git("push", "origin", "gh-pages", cwd=PAGES_DIR)
+
+        logger.info("Published to GitHub Pages successfully")
         return True
 
     except Exception:
-        logger.exception("SFTP upload failed")
+        logger.exception("GitHub Pages publish failed")
         return False
 
 
-def upload_css() -> bool:
-    """Upload the CSS file (only needs to be done once or when CSS changes)."""
-    css_path = str(config.TEMPLATES_DIR / "style.css")
-    if not Path(css_path).exists():
-        logger.warning("style.css not found at %s", css_path)
-        return False
-    return upload_files([css_path])
+def _ensure_pages_branch():
+    """Clone or update the gh-pages worktree."""
+    if PAGES_DIR.exists() and (PAGES_DIR / ".git").exists():
+        # Already cloned, just pull
+        _run_git("checkout", "gh-pages", cwd=PAGES_DIR)
+        _run_git("pull", "--rebase", "origin", "gh-pages", cwd=PAGES_DIR)
+        return
+
+    if PAGES_DIR.exists():
+        shutil.rmtree(str(PAGES_DIR))
+
+    # Get the remote URL from the main repo
+    remote_url = _run_git(
+        "remote", "get-url", "origin", cwd=str(config.BASE_DIR)
+    ).strip()
+
+    # Check if gh-pages branch exists on remote
+    result = _run_git(
+        "ls-remote", "--heads", "origin", "gh-pages",
+        cwd=str(config.BASE_DIR),
+    )
+
+    if "gh-pages" in result:
+        # Clone just the gh-pages branch
+        _run_git_raw(
+            "git", "clone", "--branch", "gh-pages", "--single-branch",
+            remote_url, str(PAGES_DIR),
+        )
+    else:
+        # Create orphan gh-pages branch
+        PAGES_DIR.mkdir(parents=True, exist_ok=True)
+        _run_git("init", cwd=PAGES_DIR)
+        _run_git("checkout", "--orphan", "gh-pages", cwd=PAGES_DIR)
+        _run_git("remote", "add", "origin", remote_url, cwd=PAGES_DIR)
+
+    # Set git identity for the pages repo
+    _run_git("config", "user.name", "Kelly Ryan", cwd=PAGES_DIR)
+    _run_git("config", "user.email", "kelly.ryan.a@protonmail.com", cwd=PAGES_DIR)
 
 
-def _mkdir_p(sftp: paramiko.SFTPClient, remote_dir: str):
-    """Recursively create remote directories if they don't exist."""
-    dirs_to_create = []
-    current = remote_dir
-    while current and current != "/":
-        try:
-            sftp.stat(current)
-            break
-        except FileNotFoundError:
-            dirs_to_create.insert(0, current)
-            current = str(Path(current).parent).replace("\\", "/")
+def _run_git(*args, cwd=None) -> str:
+    """Run a git command and return stdout."""
+    return _run_git_raw("git", *args, cwd=cwd)
 
-    for d in dirs_to_create:
-        try:
-            sftp.mkdir(d)
-            logger.debug("Created remote directory: %s", d)
-        except IOError:
-            pass  # May already exist
+
+def _run_git_raw(*args, cwd=None) -> str:
+    """Run a command and return stdout."""
+    result = subprocess.run(
+        args,
+        cwd=cwd or str(PAGES_DIR),
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    if result.returncode != 0:
+        logger.error("Command failed: %s\nstderr: %s", " ".join(args), result.stderr)
+        raise RuntimeError(f"Command failed: {' '.join(args)}\n{result.stderr}")
+    return result.stdout
