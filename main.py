@@ -98,27 +98,34 @@ def run():
         # Step 3: Generate HTML
         logger.info("Step 3: Generating HTML pages...")
         wod_page_path = generate_wod_page(wod_data, modifications)
+
+        # Save log entry before generating index so today's WOD appears in sitemap
+        log_entry["status"] = "success"
+        wod_log.append(log_entry)
+        save_wod_log(wod_log)
+
         index_page_path = generate_index_page()
 
         # Step 4: Publish to GitHub Pages
         logger.info("Step 4: Publishing to GitHub Pages...")
-        published = publish([wod_page_path, index_page_path])
+        seo_files = [
+            str(config.OUTPUT_DIR / "sitemap.xml"),
+            str(config.OUTPUT_DIR / "robots.txt"),
+        ]
+        published = publish([wod_page_path, index_page_path] + seo_files)
         if not published:
             log_entry["errors"].append("Publish to GitHub Pages failed")
             logger.warning("Publish failed — files saved locally only")
 
-        # Success
-        log_entry["status"] = "success"
         logger.info("Pipeline complete! WOD page: %s", wod_page_path)
 
     except Exception as e:
         log_entry["status"] = "error"
         log_entry["errors"].append(str(e))
         logger.exception("Pipeline failed: %s", e)
-
-    # Save log entry
-    wod_log.append(log_entry)
-    save_wod_log(wod_log)
+        # Only save on error (success was already saved before index generation)
+        wod_log.append(log_entry)
+        save_wod_log(wod_log)
 
 
 def _retry(func, label: str, max_retries: int = config.MAX_RETRIES):

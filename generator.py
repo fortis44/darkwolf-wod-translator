@@ -2,7 +2,7 @@
 
 import json
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
@@ -98,4 +98,58 @@ def generate_index_page() -> str:
     output_path = config.OUTPUT_DIR / "index.html"
     output_path.write_text(html, encoding="utf-8")
     logger.info("Generated index page with %d WODs", len(wods))
+
+    # Also regenerate sitemap and robots.txt
+    generate_sitemap(wods)
+    generate_robots_txt()
+
+    return str(output_path)
+
+
+def generate_sitemap(wods: list[dict]) -> str:
+    """Generate sitemap.xml for search engines."""
+    base = config.SITE_BASE_URL.rstrip("/")
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    urls = []
+    # Index page
+    urls.append(f"""  <url>
+    <loc>{base}/</loc>
+    <lastmod>{now}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>""")
+
+    # Individual WOD pages
+    for wod in wods:
+        urls.append(f"""  <url>
+    <loc>{base}/{wod['date']}.html</loc>
+    <lastmod>{wod['date']}</lastmod>
+    <changefreq>never</changefreq>
+    <priority>0.8</priority>
+  </url>""")
+
+    sitemap = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{chr(10).join(urls)}
+</urlset>
+"""
+
+    output_path = config.OUTPUT_DIR / "sitemap.xml"
+    output_path.write_text(sitemap, encoding="utf-8")
+    logger.info("Generated sitemap with %d URLs", len(urls))
+    return str(output_path)
+
+
+def generate_robots_txt() -> str:
+    """Generate robots.txt allowing all crawlers."""
+    base = config.SITE_BASE_URL.rstrip("/")
+    content = f"""User-agent: *
+Allow: /
+
+Sitemap: {base}/sitemap.xml
+"""
+
+    output_path = config.OUTPUT_DIR / "robots.txt"
+    output_path.write_text(content, encoding="utf-8")
     return str(output_path)
