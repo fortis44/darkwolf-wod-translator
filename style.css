@@ -1,0 +1,404 @@
+/* DarkWolf WOD Translator — Brand CSS */
+/* Matches darkwolfmissionlog.com design system */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+
+:root {
+    --bg-primary: #111111;
+    --bg-secondary: #1a1a1a;
+    --bg-card: #1e1e1e;
+    --border: #2d2d2d;
+    --neon: #00FF88;
+    --neon-dim: #00cc6a;
+    --neon-glow: rgba(0, 255, 136, 0.15);
+    --red: #cc3333;
+    --red-dim: #3a1b1b;
+    --yellow: #cccc33;
+    --orange: #cc8833;
+    --white: #e8f0f2;
+    --grey: #5a6a7a;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background: var(--bg-primary);
+    color: var(--white);
+    font-family: 'Share Tech Mono', monospace;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* HEADER */
+header {
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 2rem;
+    text-align: center;
+}
+
+header h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 1.8rem;
+    color: var(--neon);
+    text-shadow: 0 0 20px var(--neon-glow);
+    letter-spacing: 3px;
+}
+
+header h1 a {
+    color: var(--neon);
+    text-decoration: none;
+}
+
+header p {
+    color: var(--grey);
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+}
+
+/* CONTAINER */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+/* NAVIGATION */
+.nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.nav-bar a {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    color: var(--neon);
+    text-decoration: none;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    transition: all 0.2s;
+}
+
+.nav-bar a:hover {
+    border-color: var(--neon);
+    box-shadow: 0 0 10px var(--neon-glow);
+}
+
+/* DATE HEADER */
+.date-header {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--white);
+    margin-bottom: 0.3rem;
+}
+
+.wod-title {
+    color: var(--grey);
+    font-size: 0.85rem;
+    margin-bottom: 2rem;
+}
+
+/* CARDS */
+.card {
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--neon);
+    background: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 1rem;
+}
+
+.card-label {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--neon);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.card-toggle {
+    font-size: 0.7rem;
+    color: var(--grey);
+    margin-left: auto;
+}
+
+.card.collapsed .card-body {
+    display: none;
+}
+
+.card.original {
+    border-left-color: var(--grey);
+    opacity: 0.8;
+}
+
+.card.original:hover {
+    opacity: 1;
+}
+
+.card.tbi {
+    border-left-color: var(--neon);
+}
+
+.card.shoulder {
+    border-left-color: var(--orange);
+}
+
+.card.shoulder .card-label {
+    color: var(--orange);
+}
+
+/* SECTION HEADERS WITHIN CARDS */
+.section-title {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: var(--neon-dim);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 1.5rem 0 0.5rem 0;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.card.shoulder .section-title {
+    color: var(--orange);
+}
+
+/* MOVEMENT LIST */
+.movement-list {
+    list-style: none;
+    padding: 0;
+}
+
+.movement-list li {
+    padding: 0.4rem 0;
+    padding-left: 1rem;
+    position: relative;
+    font-size: 0.9rem;
+}
+
+.movement-list li::before {
+    content: ">";
+    position: absolute;
+    left: 0;
+    color: var(--neon-dim);
+    font-weight: bold;
+}
+
+.card.shoulder .movement-list li::before {
+    color: var(--orange);
+}
+
+/* SUBSTITUTION TABLE */
+.sub-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.5rem 0;
+    font-size: 0.85rem;
+}
+
+.sub-table th {
+    background: var(--bg-card);
+    color: var(--neon);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 0.5rem 0.6rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.card.shoulder .sub-table th {
+    color: var(--orange);
+}
+
+.sub-table td {
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+}
+
+.sub-table .original-move {
+    color: var(--grey);
+    text-decoration: line-through;
+}
+
+.sub-table .modified-move {
+    color: var(--white);
+    font-weight: bold;
+}
+
+.sub-table .reason {
+    color: var(--grey);
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+/* NOTES */
+.intensity-notes {
+    margin-top: 1rem;
+    padding: 0.8rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-size: 0.85rem;
+    color: var(--grey);
+    line-height: 1.5;
+}
+
+.intensity-notes strong {
+    color: var(--white);
+}
+
+/* ORIGINAL WOD TEXT */
+.original-text {
+    white-space: pre-wrap;
+    font-size: 0.85rem;
+    color: var(--grey);
+    line-height: 1.6;
+    padding: 0.5rem 0;
+}
+
+/* REST DAY BADGE */
+.rest-day-badge {
+    display: inline-block;
+    background: var(--neon);
+    color: var(--bg-primary);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 2px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-left: 0.5rem;
+}
+
+/* WORKOUT META */
+.workout-meta {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+}
+
+.workout-meta span {
+    color: var(--grey);
+}
+
+.workout-meta strong {
+    color: var(--white);
+}
+
+/* INDEX PAGE */
+.wod-list {
+    list-style: none;
+    padding: 0;
+}
+
+.wod-list li {
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--neon);
+    background: var(--bg-secondary);
+    margin-bottom: 0.75rem;
+    border-radius: 0 4px 4px 0;
+    transition: all 0.2s;
+}
+
+.wod-list li:hover {
+    border-left-color: var(--neon);
+    box-shadow: 0 0 15px var(--neon-glow);
+}
+
+.wod-list li a {
+    display: block;
+    padding: 1rem 1.25rem;
+    color: var(--white);
+    text-decoration: none;
+}
+
+.wod-list .wod-date {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--neon);
+}
+
+.wod-list .wod-title-text {
+    color: var(--grey);
+    font-size: 0.8rem;
+    margin-top: 0.2rem;
+}
+
+/* DISCLAIMER */
+.disclaimer {
+    margin-top: 2rem;
+    padding: 1rem;
+    border: 1px solid var(--red);
+    background: var(--red-dim);
+    border-radius: 3px;
+    font-size: 0.75rem;
+    color: var(--grey);
+    line-height: 1.5;
+}
+
+.disclaimer strong {
+    color: #ff6666;
+}
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--grey);
+    font-size: 0.7rem;
+    border-top: 1px solid var(--border);
+    margin-top: 2rem;
+}
+
+footer a {
+    color: var(--neon-dim);
+    text-decoration: none;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    header h1 { font-size: 1.3rem; letter-spacing: 1px; }
+    .container { padding: 1rem; }
+    .date-header { font-size: 1rem; }
+    .nav-bar { flex-direction: row; gap: 0.5rem; }
+    .nav-bar a { font-size: 0.65rem; padding: 0.3rem 0.5rem; }
+    .card { padding: 1rem; }
+    .workout-meta { flex-direction: column; gap: 0.3rem; }
+    .sub-table { font-size: 0.8rem; }
+}
+
+@media print {
+    body { background: white; color: black; }
+    header h1 { color: black; text-shadow: none; }
+    .card { border: 1px solid #ccc; border-left: 3px solid black; }
+    .card-label, .section-title { color: black; }
+    .nav-bar { display: none; }
+    .disclaimer { border-color: #ccc; background: #f5f5f5; }
+    .disclaimer strong { color: black; }
+}
