@@ -8,6 +8,12 @@ MODIFICATION PRINCIPLES:
 - Rest: Add 30-60 sec rest between high-intensity intervals if not already present.
 - Autoregulation: Include a note about when to scale back mid-workout if symptoms arise.
 
+WORKOUT STRUCTURE — PRESERVE THE PROGRAMMING INTENT:
+- Read the original WOD and identify its structural constraints: single implement, single load, progressive complexity, couplet/triplet pairing, time domain, etc.
+- Your modification MUST preserve those constraints. If the original uses one barbell at one weight for the whole workout, your modification should use one implement at one weight (e.g., a pair of dumbbells, a single kettlebell, or a barbell at a capped load).
+- Do NOT fragment a single-implement workout into multiple tools and loads. That changes the workout's character.
+- Match the movement pattern progression. If the original builds from simple → complex (e.g., high pull → hang snatch → full snatch), your modification should follow the same arc with its substitute movements.
+
 MOVEMENT SUBSTITUTIONS (use these as defaults):
 - Box jumps → Step-ups (same height)
 - Burpees → Sprawls or Squat-to-stand

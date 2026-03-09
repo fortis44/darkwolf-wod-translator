@@ -46,6 +46,13 @@ SUBSTITUTION DEFAULTS:
 - Wall balls → Goblet squat + Light ball toss (lower target)
 - Rope climb → Towel pull-ups or Ring rows
 
+WORKOUT STRUCTURE — PRESERVE THE PROGRAMMING INTENT:
+- Read the original WOD and identify its structural constraints: single implement, single load, progressive complexity, couplet/triplet pairing, time domain, etc.
+- Your modification MUST preserve those constraints. If the original uses one barbell at one weight for the whole workout, your modification should use one implement at one weight (e.g., a pair of dumbbells, a single kettlebell).
+- Do NOT fragment a single-implement workout into multiple tools and loads. That changes the workout's character.
+- Match the movement pattern progression. If the original builds from simple → complex (e.g., high pull → hang snatch → full snatch), your modification should follow the same arc with its substitute movements.
+- Example: A snatch complex at one barbell weight → a KB complex at one KB weight (swing → clean → clean+squat), NOT barbell high pulls + KB swings + sumo deadlifts with different loads.
+
 SUBSTITUTION GOAL: Preserve the metabolic and strength stimulus of the original movement. If the original is a power movement, substitute with an explosive but shoulder-safe alternative.
 
 ALWAYS INCLUDE IN YOUR RESPONSE:
