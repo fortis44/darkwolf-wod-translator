@@ -1,170 +1,107 @@
 """Scrapes the daily WOD from crossfit.com."""
 
-import json
-import re
 import logging
+import re
+from datetime import date, timedelta
+
 import requests
-from datetime import date
+from bs4 import BeautifulSoup
 
 import config
 
 logger = logging.getLogger(__name__)
 
-# REST_DAY_KEYWORDS appear in WOD text when there's no workout
 REST_DAY_KEYWORDS = ["rest day", "rest", "active recovery"]
 
 
-def fetch_wod() -> dict:
-    """Fetch today's WOD from crossfit.com.
+def fetch_wod(target_date: date | None = None) -> dict:
+    """Fetch a WOD from crossfit.com for the given date.
 
-    Returns dict with keys: date, title, raw_text, is_rest_day
+    CrossFit typically posts tomorrow's WOD in the evening, so by default
+    we fetch today's date (which was posted the night before).
+
+    Args:
+        target_date: The date to fetch. Defaults to today.
+
+    Returns:
+        dict with keys: date, title, raw_text, is_rest_day
     """
-    logger.info("Fetching WOD from %s", config.CROSSFIT_WOD_URL)
+    if target_date is None:
+        target_date = date.today()
+
+    url = _build_url(target_date)
+    logger.info("Fetching WOD from %s", url)
 
     resp = requests.get(
-        config.CROSSFIT_WOD_URL,
-        headers={"User-Agent": "DarkWolf WOD Translator/1.0"},
+        url,
+        headers={
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/120.0.0.0 Safari/537.36"
+            )
+        },
         timeout=30,
     )
     resp.raise_for_status()
 
-    wod_data = _parse_preloaded_state(resp.text)
-
-    if wod_data is None:
-        wod_data = _parse_html_fallback(resp.text)
-
-    if wod_data is None:
-        raise ValueError("Could not parse WOD from crossfit.com response")
-
-    logger.info("WOD fetched for %s: %s", wod_data["date"], wod_data["title"])
-    return wod_data
-
-
-def _parse_preloaded_state(html: str) -> dict | None:
-    """Try to extract WOD from window.__PRELOADED_STATE__ JSON."""
-    match = re.search(
-        r"window\.__PRELOADED_STATE__\s*=\s*({.*?});?\s*</script>",
-        html,
-        re.DOTALL,
-    )
-    if not match:
-        logger.debug("No __PRELOADED_STATE__ found, trying fallback")
-        return None
-
-    try:
-        state = json.loads(match.group(1))
-    except json.JSONDecodeError:
-        logger.warning("Failed to parse __PRELOADED_STATE__ JSON")
-        return None
-
-    # Navigate the state object — structure may vary
-    # Try common paths: state.wod, state.data, state.posts, etc.
-    wod_text = None
-    wod_title = None
-    wod_date = None
-
-    # Path 1: state -> wod or workout
-    for key in ("wod", "workout", "data"):
-        if key in state and isinstance(state[key], dict):
-            obj = state[key]
-            wod_text = obj.get("description") or obj.get("content") or obj.get("text")
-            wod_title = obj.get("title", "")
-            wod_date = obj.get("date", "")
-            if wod_text:
-                break
-
-    # Path 2: nested in posts/items list
-    if not wod_text:
-        for key in ("posts", "items", "workouts"):
-            items = state.get(key, [])
-            if isinstance(items, list) and items:
-                obj = items[0]
-                if isinstance(obj, dict):
-                    wod_text = (
-                        obj.get("description")
-                        or obj.get("content")
-                        or obj.get("text")
-                    )
-                    wod_title = obj.get("title", "")
-                    wod_date = obj.get("date", "")
-                    if wod_text:
-                        break
-
-    # Path 3: deep search for any key containing 'wod' or 'workout'
-    if not wod_text:
-        wod_text = _deep_search_text(state)
+    wod_text = _extract_article_text(resp.text)
 
     if not wod_text:
-        return None
+        raise ValueError(f"Could not extract WOD text from {url}")
 
-    if not wod_date:
-        wod_date = date.today().isoformat()
+    # Extract title from page
+    title_match = re.search(r"<title>(.*?)</title>", resp.text)
+    title = title_match.group(1).strip() if title_match else ""
+    # Clean up title
+    title = re.sub(r"\s*\|\s*CrossFit.*$", "", title).strip()
 
     is_rest_day = _is_rest_day(wod_text)
+    date_str = target_date.isoformat()
+
+    logger.info("WOD fetched for %s (%d chars, rest_day=%s)", date_str, len(wod_text), is_rest_day)
 
     return {
-        "date": wod_date,
-        "title": wod_title or f"WOD - {wod_date}",
-        "raw_text": wod_text.strip(),
+        "date": date_str,
+        "title": title or f"WOD - {date_str}",
+        "raw_text": wod_text,
         "is_rest_day": is_rest_day,
     }
 
 
-def _deep_search_text(obj, depth=0) -> str | None:
-    """Recursively search JSON for workout text content."""
-    if depth > 5:
-        return None
-    if isinstance(obj, str) and len(obj) > 50:
-        # Likely a workout description
-        return obj
-    if isinstance(obj, dict):
-        for key in obj:
-            if any(kw in key.lower() for kw in ("wod", "workout", "description", "content")):
-                val = obj[key]
-                if isinstance(val, str) and len(val) > 20:
-                    return val
-        for val in obj.values():
-            result = _deep_search_text(val, depth + 1)
-            if result:
-                return result
-    if isinstance(obj, list):
-        for item in obj:
-            result = _deep_search_text(item, depth + 1)
-            if result:
-                return result
-    return None
+def _build_url(d: date) -> str:
+    """Build the crossfit.com workout URL for a given date."""
+    return f"https://www.crossfit.com/workout/{d.year}/{d.month:02d}/{d.day:02d}"
 
 
-def _parse_html_fallback(html: str) -> dict | None:
-    """Fallback: parse WOD from HTML content directly."""
-    from bs4 import BeautifulSoup
-
+def _extract_article_text(html: str) -> str | None:
+    """Extract the WOD text from the <article> tag."""
     soup = BeautifulSoup(html, "html.parser")
 
-    # Look for common WOD container patterns
-    selectors = [
-        ".wod-content",
-        ".workout-content",
-        "[class*='wod']",
-        "[class*='workout']",
-        "article",
-        ".entry-content",
-        ".post-content",
-    ]
-
-    for selector in selectors:
-        el = soup.select_one(selector)
-        if el:
-            text = el.get_text(separator="\n").strip()
-            if len(text) > 20:
-                title_el = soup.select_one("h1, h2, .wod-title, .entry-title")
-                title = title_el.get_text().strip() if title_el else ""
-                return {
-                    "date": date.today().isoformat(),
-                    "title": title or f"WOD - {date.today().isoformat()}",
-                    "raw_text": text,
-                    "is_rest_day": _is_rest_day(text),
-                }
+    article = soup.find("article")
+    if article:
+        text = article.get_text(separator="\n").strip()
+        if len(text) > 20:
+            # Clean up excessive whitespace while preserving structure
+            lines = [line.strip() for line in text.splitlines()]
+            # Remove consecutive blank lines (keep max 1)
+            cleaned = []
+            prev_blank = False
+            for line in lines:
+                if not line:
+                    if not prev_blank:
+                        cleaned.append("")
+                    prev_blank = True
+                else:
+                    cleaned.append(line)
+                    prev_blank = False
+            result = "\n".join(cleaned).strip()
+            # Strip trailing boilerplate
+            for marker in ["Find a gym near you:", "View the CrossFit map"]:
+                idx = result.find(marker)
+                if idx != -1:
+                    result = result[:idx].strip()
+            return result
 
     return None
 
@@ -172,7 +109,11 @@ def _parse_html_fallback(html: str) -> dict | None:
 def _is_rest_day(text: str) -> bool:
     """Detect if the WOD is a rest day."""
     text_lower = text.lower().strip()
-    # If the entire text is very short and contains rest keywords
+    # Short text with rest keyword
     if len(text_lower) < 100:
         return any(kw in text_lower for kw in REST_DAY_KEYWORDS)
+    # First line is "Rest Day" (crossfit.com rest day pages start this way)
+    first_line = text_lower.split("\n")[0].strip()
+    if first_line in ("rest day", "rest"):
+        return True
     return False
