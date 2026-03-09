@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DarkWolf WOD — {{ date_display }}</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1><a href="index.html">DARKWOLF WOD</a></h1>
+    <p>TBI-Adapted CrossFit // Modified Daily WODs</p>
+</header>
+
+<div class="container">
+
+    <!-- Navigation -->
+    <div class="nav-bar">
+        <a href="{{ prev_date }}.html">&larr; Previous Day</a>
+        <a href="index.html">All WODs</a>
+        <a href="{{ next_date }}.html">Next Day &rarr;</a>
+    </div>
+
+    <!-- Date -->
+    <h2 class="date-header">
+        {{ date_display }}
+        {% if is_rest_day %}<span class="rest-day-badge">Rest Day</span>{% endif %}
+    </h2>
+    {% if title %}<p class="wod-title">{{ title }}</p>{% endif %}
+
+    <!-- ORIGINAL WOD (collapsible, starts collapsed) -->
+    <div class="card original collapsed">
+        <div class="card-header" onclick="this.parentElement.classList.toggle('collapsed')">
+            <span class="card-label">Original WOD</span>
+            <span class="card-toggle">[ click to expand ]</span>
+        </div>
+        <div class="card-body">
+            <div class="original-text">{{ original_wod }}</div>
+        </div>
+    </div>
+
+    <!-- TBI-ADAPTED VERSION -->
+    <div class="card tbi">
+        <div class="card-header" onclick="this.parentElement.classList.toggle('collapsed')">
+            <span class="card-label">TBI-Adapted</span>
+            <span class="card-toggle">[ toggle ]</span>
+        </div>
+        <div class="card-body">
+            <!-- Warmup -->
+            <div class="section-title">Warmup ({{ tbi.warmup.duration | default('5-8 min') }})</div>
+            <ul class="movement-list">
+                {% for move in tbi.warmup.movements | default([]) %}
+                <li>{{ move }}</li>
+                {% endfor %}
+            </ul>
+
+            <!-- Workout -->
+            <div class="section-title">Workout — {{ tbi.workout.name | default('Modified WOD') }}</div>
+            <div class="workout-meta">
+                {% if tbi.workout.type %}<span>Type: <strong>{{ tbi.workout.type }}</strong></span>{% endif %}
+                {% if tbi.workout.time_cap %}<span>Time Cap: <strong>{{ tbi.workout.time_cap }}</strong></span>{% endif %}
+            </div>
+
+            {% if tbi.workout.movements %}
+            <table class="sub-table">
+                <thead>
+                    <tr>
+                        <th>Original</th>
+                        <th>Modified</th>
+                        <th>Why</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for move in tbi.workout.movements %}
+                    <tr>
+                        <td class="original-move">{{ move.original | default('') }}</td>
+                        <td class="modified-move">{{ move.modified | default('') }}</td>
+                        <td class="reason">{{ move.reason | default('') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+
+            {% if tbi.workout.rx_notes %}
+            <div class="intensity-notes"><strong>Rx Notes:</strong> {{ tbi.workout.rx_notes }}</div>
+            {% endif %}
+
+            {% if tbi.workout.notes %}
+            <div class="intensity-notes"><strong>Coaching Notes:</strong> {{ tbi.workout.notes }}</div>
+            {% endif %}
+
+            <!-- Cooldown -->
+            <div class="section-title">Cooldown ({{ tbi.cooldown.duration | default('5 min') }})</div>
+            <ul class="movement-list">
+                {% for move in tbi.cooldown.movements | default([]) %}
+                <li>{{ move }}</li>
+                {% endfor %}
+            </ul>
+
+            {% if tbi.intensity_notes %}
+            <div class="intensity-notes"><strong>Intensity Notes:</strong> {{ tbi.intensity_notes }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- TBI + SHOULDER VERSION -->
+    <div class="card shoulder">
+        <div class="card-header" onclick="this.parentElement.classList.toggle('collapsed')">
+            <span class="card-label">TBI + Shoulder-Safe</span>
+            <span class="card-toggle">[ toggle ]</span>
+        </div>
+        <div class="card-body">
+            <!-- Warmup -->
+            <div class="section-title">Warmup ({{ tbi_rc.warmup.duration | default('5-8 min') }})</div>
+            <ul class="movement-list">
+                {% for move in tbi_rc.warmup.movements | default([]) %}
+                <li>{{ move }}</li>
+                {% endfor %}
+            </ul>
+
+            <!-- Workout -->
+            <div class="section-title">Workout — {{ tbi_rc.workout.name | default('Modified WOD (Shoulder-Safe)') }}</div>
+            <div class="workout-meta">
+                {% if tbi_rc.workout.type %}<span>Type: <strong>{{ tbi_rc.workout.type }}</strong></span>{% endif %}
+                {% if tbi_rc.workout.time_cap %}<span>Time Cap: <strong>{{ tbi_rc.workout.time_cap }}</strong></span>{% endif %}
+            </div>
+
+            {% if tbi_rc.workout.movements %}
+            <table class="sub-table">
+                <thead>
+                    <tr>
+                        <th>Original</th>
+                        <th>Modified</th>
+                        <th>Why</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for move in tbi_rc.workout.movements %}
+                    <tr>
+                        <td class="original-move">{{ move.original | default('') }}</td>
+                        <td class="modified-move">{{ move.modified | default('') }}</td>
+                        <td class="reason">{{ move.reason | default('') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+
+            {% if tbi_rc.workout.rx_notes %}
+            <div class="intensity-notes"><strong>Rx Notes:</strong> {{ tbi_rc.workout.rx_notes }}</div>
+            {% endif %}
+
+            {% if tbi_rc.workout.notes %}
+            <div class="intensity-notes"><strong>Coaching Notes:</strong> {{ tbi_rc.workout.notes }}</div>
+            {% endif %}
+
+            <!-- Cooldown -->
+            <div class="section-title">Cooldown ({{ tbi_rc.cooldown.duration | default('5 min') }})</div>
+            <ul class="movement-list">
+                {% for move in tbi_rc.cooldown.movements | default([]) %}
+                <li>{{ move }}</li>
+                {% endfor %}
+            </ul>
+
+            {% if tbi_rc.intensity_notes %}
+            <div class="intensity-notes"><strong>Intensity Notes:</strong> {{ tbi_rc.intensity_notes }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="disclaimer">
+        <strong>MEDICAL DISCLAIMER:</strong> These modifications are generated by AI for someone
+        1+ years post-TBI who has been cleared for exercise. This is not medical advice.
+        Stop immediately if you experience sharp headache, nausea, disorientation, or worsening symptoms.
+        Consult your healthcare provider before beginning any new exercise program.
+    </div>
+
+</div>
+
+<footer>
+    <a href="https://www.darkwolfmissionlog.com">DarkWolf Mission Log</a> // WOD Translator
+</footer>
+
+</body>
+</html>
