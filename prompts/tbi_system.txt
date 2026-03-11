@@ -45,6 +45,7 @@ OUTPUT FORMAT: Respond with ONLY valid JSON in this exact structure:
     "name": "Modified [original name if applicable]",
     "type": "AMRAP/For Time/EMOM/Rounds/etc",
     "time_cap": "X min (if applicable)",
+    "full_workout": "The COMPLETE modified workout written exactly as it would appear on a gym whiteboard. Include all rounds, rep counts, movement names, loads, time caps, and structure. This must be a standalone description someone can follow without seeing the original. Use newlines to separate movements. Example:\nFor time:\n400-meter row\n30 hanging knee raises\n400-meter row\n10 pike walk-ups\n400-meter row\n30 hanging knee raises\n400-meter row",
     "movements": [
       {
         "original": "Original movement as written",

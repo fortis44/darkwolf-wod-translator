@@ -272,6 +272,24 @@ header nav a:hover {
     font-style: italic;
 }
 
+/* FULL WORKOUT (whiteboard-style display) */
+.full-workout {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--neon);
+    border-radius: 0 4px 4px 0;
+    padding: 1.2rem 1.5rem;
+    margin: 0.75rem 0;
+    font-size: 0.95rem;
+    color: var(--white);
+    line-height: 1.8;
+    white-space: pre-wrap;
+}
+
+.card.shoulder .full-workout {
+    border-left-color: var(--orange);
+}
+
 /* NOTES */
 .intensity-notes {
     margin-top: 1rem;

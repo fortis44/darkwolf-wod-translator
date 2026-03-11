@@ -71,7 +71,12 @@
                 {% if tbi.workout.time_cap %}<span>Time Cap: <strong>{{ tbi.workout.time_cap }}</strong></span>{% endif %}
             </div>
 
+            {% if tbi.workout.full_workout %}
+            <div class="full-workout">{{ tbi.workout.full_workout | replace('\n', '<br>') | safe }}</div>
+            {% endif %}
+
             {% if tbi.workout.movements %}
+            <div class="section-title" style="margin-top: 1.5rem; font-size: 0.85rem;">Movement Substitutions</div>
             <table class="sub-table">
                 <thead>
                     <tr>
@@ -136,7 +141,12 @@
                 {% if tbi_rc.workout.time_cap %}<span>Time Cap: <strong>{{ tbi_rc.workout.time_cap }}</strong></span>{% endif %}
             </div>
 
+            {% if tbi_rc.workout.full_workout %}
+            <div class="full-workout">{{ tbi_rc.workout.full_workout | replace('\n', '<br>') | safe }}</div>
+            {% endif %}
+
             {% if tbi_rc.workout.movements %}
+            <div class="section-title" style="margin-top: 1.5rem; font-size: 0.85rem;">Movement Substitutions</div>
             <table class="sub-table">
                 <thead>
                     <tr>
