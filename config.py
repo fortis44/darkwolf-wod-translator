@@ -26,8 +26,12 @@ CROSSFIT_WOD_URL = "https://www.crossfit.com/wod"
 AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
 CLAUDE_MODEL = "us.anthropic.claude-sonnet-4-20250514-v1:0"
 
-# Site
-SITE_BASE_URL = "https://wod.darkwolfmissionlog.com"
+# Site — now hosted under main site at /wod/
+SITE_BASE_URL = "https://darkwolfmissionlog.com/wod"
+
+# Main site repo for publishing
+SITE_DIR = Path("C:/DarkWolfSite")
+SITE_WOD_DIR = SITE_DIR / "wod"
 
 # Retry settings
 MAX_RETRIES = 3

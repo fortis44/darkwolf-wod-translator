@@ -1,4 +1,4 @@
-/* DarkWolf WOD Translator — Brand CSS */
+/* DarkWolf WOD — Stealth Purple Brand CSS */
 /* Matches darkwolfmissionlog.com design system */
 
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
@@ -8,15 +8,16 @@
     --bg-secondary: #1a1a1a;
     --bg-card: #1e1e1e;
     --border: #2d2d2d;
-    --neon: #00FF88;
-    --neon-dim: #00cc6a;
-    --neon-glow: rgba(0, 255, 136, 0.15);
+    --neon: #9D8CE6;
+    --neon-dim: #7B6BBF;
+    --neon-glow: rgba(157, 140, 230, 0.18);
     --red: #cc3333;
     --red-dim: #3a1b1b;
     --yellow: #cccc33;
     --orange: #cc8833;
     --white: #e8f0f2;
     --grey: #5a6a7a;
+    --grey-light: #8a9aaa;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -54,6 +55,24 @@ header p {
     color: var(--grey);
     font-size: 0.85rem;
     margin-top: 0.3rem;
+}
+
+header nav {
+    margin-bottom: 0.75rem;
+}
+
+header nav a {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    color: var(--grey);
+    text-decoration: none;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+}
+
+header nav a:hover {
+    color: var(--neon);
 }
 
 /* CONTAINER */
@@ -381,6 +400,10 @@ footer a {
     text-decoration: none;
 }
 
+footer a:hover {
+    color: var(--neon);
+}
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
     header h1 { font-size: 1.3rem; letter-spacing: 1px; }
@@ -395,7 +418,9 @@ footer a {
 
 @media print {
     body { background: white; color: black; }
+    header { border-bottom: 2px solid black; }
     header h1 { color: black; text-shadow: none; }
+    header nav { display: none; }
     .card { border: 1px solid #ccc; border-left: 3px solid black; }
     .card-label, .section-title { color: black; }
     .nav-bar { display: none; }
