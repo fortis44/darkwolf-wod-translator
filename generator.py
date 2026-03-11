@@ -2,6 +2,7 @@
 
 import json
 import logging
+import re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -10,6 +11,23 @@ from jinja2 import Environment, FileSystemLoader
 import config
 
 logger = logging.getLogger(__name__)
+
+
+def sanitize_workout_html(text: str) -> str:
+    """Strip all HTML tags except <br> from workout text.
+
+    Claude API output is trusted but this adds defense-in-depth
+    against any unexpected HTML in the full_workout field.
+    """
+    if not text:
+        return text
+    # Preserve <br>, <br/>, <br /> variants
+    text = re.sub(r'<br\s*/?>', '\x00BR\x00', text, flags=re.IGNORECASE)
+    # Strip all other HTML tags
+    text = re.sub(r'<[^>]+>', '', text)
+    # Restore <br> tags
+    text = text.replace('\x00BR\x00', '<br>')
+    return text
 
 
 def get_jinja_env() -> Environment:
@@ -44,6 +62,12 @@ def generate_wod_page(wod_data: dict, modifications: dict) -> str:
     prev_date = (dt - timedelta(days=1)).strftime("%Y-%m-%d")
     next_date = (dt + timedelta(days=1)).strftime("%Y-%m-%d")
     filename = dt.strftime("%Y-%m-%d") + ".html"
+
+    # Sanitize full_workout fields (defense-in-depth against unexpected HTML)
+    for variant in ("tbi", "tbi_rc"):
+        workout = modifications[variant].get("workout", {})
+        if "full_workout" in workout:
+            workout["full_workout"] = sanitize_workout_html(workout["full_workout"])
 
     html = template.render(
         date_display=date_display,
